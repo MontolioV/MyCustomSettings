@@ -45,6 +45,10 @@ module.exports = {
     'func-call-spacing': [ 'error', 'never', ],
     // enforce consistent spacing before function definition opening parenthesis
     'space-before-function-paren': [ 'error', 'always', ],
+    // enforce consistent spacing inside parentheses
+    'space-in-parens': [ 'error', 'never', ],
+    // enforce consistent spacing before and after the arrow in arrow functions
+    'arrow-spacing': [ 'error', ],
 
     // Objects
     // enforce consistent spacing inside braces
@@ -54,7 +58,9 @@ module.exports = {
     // enforce line breaks after each array element
     'object-property-newline': 'error',
     // enforce consistent spacing between keys and values in object literal properties
-    'key-spacing': [ 'error', { 'beforeColon': false, 'mode': 'strict', }, ],
+    'key-spacing': [ 'error', { 'beforeColon': false, 'afterColon': true, 'mode': 'strict', }, ],
+    // disallow whitespace before properties
+    'no-whitespace-before-property': 'error',
 
     // Arrays
     // enforce linebreaks after opening and before closing array brackets
@@ -63,6 +69,8 @@ module.exports = {
     'array-bracket-newline': [ 'error', { 'minItems': 4, 'multiline': true, }, ],
     // enforce line breaks after each array element
     'array-element-newline': [ 'error', { 'minItems': 4, 'multiline': true, }, ],
+    // enforce consistent spacing inside computed property brackets
+    'computed-property-spacing': [ 'error', 'never', ],
 
     // allow alerts, console, debugger, unused-vars during development
     'no-alert': process.env.NODE_ENV === envProd ? 2 : 0,
