@@ -1,0 +1,15 @@
+{
+  "name": "px-rem-converter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "px-to-rem.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "clipboardy": "^2.1.0"
+  }
+}
