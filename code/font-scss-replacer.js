@@ -1,10 +1,12 @@
 const fs = require('fs');
 const readline = require('readline');
 
+let path = ''
+let fontDir = ''
 let result = `$path: 'assets/fonts/' !default;\n\n`
 
 async function processLineByLine() {
-  const fileStream = fs.createReadStream('');
+  const fileStream = fs.createReadStream(path);
 
   const rl = readline.createInterface({
     input: fileStream,
@@ -20,7 +22,7 @@ async function processLineByLine() {
       let f = filename.indexOf('\'')+1
       let l = filename.indexOf('\'',f)
       filename = filename.substr(f,l-f)
-      let mutline = line.replace(/url\(.*\) format/,`url($path + 'Poppins/${filename}.ttf') format`)
+      let mutline = line.replace(/url\(.*\) format/,`url($path + '${fontDir}/${filename}.ttf') format`)
       mutline = mutline.replace('woff2',`truetype`)
       result += mutline + '\n'
     }else {
