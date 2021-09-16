@@ -1,0 +1,3 @@
+To replace all 'color:'
+[^-]\bcolor: (?!'#F00'|.*rgba.*)[^,;\n]*[,;]
+
