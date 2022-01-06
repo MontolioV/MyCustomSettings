@@ -1,3 +1,4 @@
+const fs = require("fs");
 let s = `
 
 `
@@ -12,3 +13,4 @@ s = s
   .join('\n',)
 
 console.log(s,)
+fs.writeFileSync('report.txt', s)
