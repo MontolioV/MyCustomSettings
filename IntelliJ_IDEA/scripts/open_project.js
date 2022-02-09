@@ -11,16 +11,19 @@ projects.forEach((pr, idx) => {
   return pr.name;
 })
 
-readline.question('Choose a project to open (index):', (idx) => {
-  let project = projects[idx]
-  if (!project) {
-    console.warn('There is no project with index', idx);
-  } else {
-    console.log('Opening project', project.name);
-    project.directories.forEach((dir) => {
-      console.log('* Opening ', dir)
-      execSync(`idea64.exe ${dir}`,)
-    })
-  }
+readline.question('Choose a project to open (indexes separated by space, like "1 2"):', (idxsStr) => {
+  let idxs = idxsStr.split(' ')
+  idxs.forEach((idx) => {
+    let project = projects[idx]
+    if (!project) {
+      console.warn('There is no project with index', idx);
+    } else {
+      console.log('Opening project', project.name);
+      project.directories.forEach((dir) => {
+        console.log('* Opening ', dir)
+        execSync(`idea64.exe ${dir}`,)
+      })
+    }
+  })
   readline.close()
 })
