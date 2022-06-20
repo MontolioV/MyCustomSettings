@@ -5,13 +5,37 @@ let readline = require('readline').createInterface({
 const {execSync} = require('child_process');
 let projects = require('./projects.json')
 
-console.log('Available projects:',)
-projects.forEach((pr, idx) => {
-  console.log(`${idx}\t${pr.name}`)
-  return pr.name;
-})
+queryInput()
 
-readline.question('Choose a project to open (indexes separated by space, like "1 2"):', (idxsStr) => {
+function queryInput() {
+  console.log('Available projects:',)
+  projects.forEach((pr, idx) => {
+    console.log(`${idx}\t${pr.name}`)
+    return pr.name;
+  })
+
+  readline.question('Choose a project to open (indexes separated by space, like "1 2") or filter with "?" ("?vs360"):', (str) => {
+    if (str.startsWith('?')) {
+      filterOptions(str)
+    } else {
+      openByIndexes(str)
+    }
+  })
+}
+
+// format '?something'
+function filterOptions(str) {
+  let filterStr = str.substring(1)
+  console.log(`Filtering by ${filterStr}`,)
+
+  projects = projects.filter((project) => {
+    return project.name.includes(filterStr)
+  })
+
+  queryInput()
+}
+
+function openByIndexes(idxsStr) {
   let idxs = idxsStr.split(' ')
   idxs.forEach((idx) => {
     let project = projects[idx]
@@ -25,5 +49,6 @@ readline.question('Choose a project to open (indexes separated by space, like "1
       })
     }
   })
+
   readline.close()
-})
+}
