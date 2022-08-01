@@ -59,6 +59,8 @@ projectsForReport.forEach((project) => {
         return objs[0]
       }
     })
+
+    commitMessages = commitMessages.filter((m) => !(m.msg === '' && !!m.title?.match(/^\d+\.\d+\.\d+$/)))
     sectionResults.push(commitMessages)
   })
 
