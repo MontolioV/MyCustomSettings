@@ -1,8 +1,6 @@
-module.exports = [
+export default [
   {
     sectionName: 'sectionName',
-    gitPaths: [
-      'absolute path to git repository',
-    ],
+    gitPaths: ['absolute path to git repository'],
   },
-]
+];
