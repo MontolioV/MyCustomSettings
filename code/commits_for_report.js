@@ -14,7 +14,7 @@ projectsForReport.forEach((project) => {
   let sectionResults = [];
   project.gitPaths.forEach((path) => {
     let projectResult = execSync(
-      `git -C "${path}" --no-pager log ` +
+      `git -C "${path}" --no-pager log --branches --no-merges ` +
         `--since "${startDate}" --until "${endDate}" ` +
         `--author "${authorEmail}"`,
       { encoding: 'utf8' },
@@ -72,7 +72,10 @@ projectsForReport.forEach((project) => {
     });
 
     commitMessages = commitMessages.filter(
-      (m) => !(m.msg === '' && !!m.title?.match(/^\d+\.\d+\.\d+$/)),
+      (m) => {
+        if (m.title==='Dependencies upgrade:') return false
+        return !(m.msg === '' && !!m.title?.match(/^\d+\.\d+\.\d+$/));
+      },
     );
     sectionResults.push(commitMessages);
   });
