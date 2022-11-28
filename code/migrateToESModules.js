@@ -1,3 +1,4 @@
+// node code/migrateToESModules.js -r
 /* eslint-disable @typescript-eslint/no-var-requires */
 import fs from 'fs';
 import path from 'path';
@@ -18,7 +19,7 @@ let INPUT_ROOT_PATH = process.argv[argIdx];
 
 if (!INPUT_ROOT_PATH) {
   throw new Error(
-    `Incorrect arguments, example: "node ./scripts/checkInvalidContextImports.js [-r] $FILE_PATH"`,
+    `Incorrect arguments, example: "node ./code/migrateToESModules.js [-r] $FILE_PATH"`,
   );
 }
 
