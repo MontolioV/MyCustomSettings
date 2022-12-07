@@ -52,7 +52,11 @@ function openByIndexes(idxsStr) {
       console.log('Opening project', project.name);
       project.directories.forEach((dir) => {
         console.log('* Opening ', dir);
-        execSync(`idea64.exe ${dir}`);
+        try {
+          execSync(`idea64.exe ${dir}`);
+        } catch (e) {
+          console.error(e)
+        }
       });
     }
   });
