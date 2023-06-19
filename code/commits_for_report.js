@@ -3,11 +3,23 @@ import { execSync } from 'child_process';
 import projectsForReport from './projectsForReport.js';
 
 // not including
-let startDate = '24.07.2022';
+let startDate = '';
 // including
-let endDate = '31.07.2022';
+let endDate = '';
 let authorEmail = '';
 let resultFileName = 'report.txt';
+
+if (!startDate || !endDate) {
+  let now = new Date();
+  let daysToEndSunday = -now.getDay();
+  let daysToStartSunday = daysToEndSunday - 7;
+  let dayMS = 24 * 60 * 60 * 1000;
+  startDate = new Date(now.getTime() + daysToStartSunday * dayMS).toLocaleDateString('ua-UA');
+  endDate = new Date(now.getTime() + daysToEndSunday * dayMS).toLocaleDateString('ua-UA');
+}
+
+console.log('startDate',startDate)
+console.log('endDate',endDate)
 
 let report = '';
 projectsForReport.forEach((project) => {
