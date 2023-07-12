@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'node:url';
+import {fileURLToPath} from 'node:url';
 
 let replaceRegexp = /from '(\..*|@qwerty.*)'/gi;
 
@@ -74,12 +74,12 @@ function checkConflictingContexts(filePathStr) {
 
   promises.push(
     new Promise((resolve) => {
-      fs.readFile(filePathStr, { encoding: 'utf8' }, (err, code) => {
+      fs.readFile(filePathStr, {encoding: 'utf8'}, (err, code) => {
         if (err) throw err;
 
         if (replaceRegexp.test(code)) {
           code = code.replaceAll(replaceRegexp, (match, group) => {
-            if (group.endsWith('.js')) return match;
+            if (group.endsWith('.js') | group.endsWith('.glb')) return match;
             return match.slice(0, -1) + ".js'";
           });
           fs.writeFile(filePathStr, code, () => resolve());

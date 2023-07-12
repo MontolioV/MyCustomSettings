@@ -1,0 +1,3 @@
+git fetch origin master:master && git rebase HEAD master && git push origin refs/heads/master:master --tags && git checkout dev
+
+git fetch origin main:main && git rebase HEAD main && git push origin refs/heads/main:main --tags && git checkout dev
