@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script>
+  async function main() {
+
+    console.time('prep')
+    const adapter = await navigator.gpu?.requestAdapter();
+    const device = await adapter?.requestDevice();
+    if (!device) {
+      fail('need a browser that supports WebGPU');
+      throw new Error(`need a browser that supports WebGPU`)
+    }
+    console.timeEnd('prep')
+
+    let multiplier = 32
+    let layoutSide = 128 * multiplier
+    let panels = []
+    let i = 0
+    for (let r = 0; r < layoutSide; r++) {
+      let row = []
+      panels.push(row)
+      for (let c = 0; c < layoutSide; c++) {
+        // row.push(i++)
+        row.push(Math.round(Math.random()))
+      }
+    }
+    let panelsFlat = panels.flat()
+    console.log('!@# z.html:():17 ', panels)
+    console.log('!@# z.html:():17 ', panelsFlat)
+
+    cpu();
+    gpu();
+
+    function cpu() {
+      console.time('cpu')
+      let result = []
+      for (let r = 0; r < layoutSide; r++) {
+        let row = []
+        result.push(row)
+        for (let c = 0; c < layoutSide; c++) {
+          let distance = 0
+          for (let i = 0; i <= r + 1; i++) {
+            if (r - i === -1 || panels[r - i][c] === 0) {
+              distance = i
+              break
+            }
+          }
+          row.push(distance)
+        }
+      }
+      console.timeEnd('cpu')
+      {
+        let s = ''
+        for (let i = 0; i < 8; i++) {
+          for (let j = 0; j < 8; j++) {
+            s += result[i][j] + ','
+          }
+          s += '\n'
+        }
+        console.log(s)
+      }
+    }
+
+    async function gpu() {
+      console.time('compute shader')
+
+      const dispatchCount = [16 * multiplier, 16 * multiplier, 1];
+      const workgroupSize = [8, 8, 1];
+
+      // multiply all elements of an array
+      const arrayProd = arr => arr.reduce((a, b) => a * b);
+
+      const numThreadsPerWorkgroup = arrayProd(workgroupSize);
+
+      const code = `
+  @group(0) @binding(0) var<storage, read> panels: array<u32>;
+  @group(0) @binding(1) var<storage, read_write> result: array<u32>;
+
+  @compute @workgroup_size(${workgroupSize}) fn computeSomething(
+      @builtin(workgroup_id) workgroup_id : vec3<u32>,
+      @builtin(local_invocation_id) local_invocation_id : vec3<u32>,
+      @builtin(global_invocation_id) global_invocation_id : vec3<u32>,
+      @builtin(local_invocation_index) local_invocation_index: u32,
+      @builtin(num_workgroups) num_workgroups: vec3<u32>
+  ) {
+    // for(var c: u32 = 0; c <= ${dispatchCount[1]}; c++){
+    //   let glob_index =
+    //      global_invocation_id.x +
+    //      c * num_workgroups.x * ${workgroupSize[0]} +
+    //      global_invocation_id.z * num_workgroups.x * ${workgroupSize[0]} * num_workgroups.y;
+    //
+    //   var distance:u32 = 0;
+    //   if (panels[glob_index] != 0){
+    //     for(var i: u32 = 0; i <= c+1; i++){
+    //       let nb_index = glob_index - i * num_workgroups.x * ${workgroupSize[0]};
+    //
+    //         if (c-i+1 == 0 || panels[nb_index] == 0) {
+    //           distance = i;
+    //           break;
+    //         }
+    //     }
+    //   }
+    //
+    //   result[glob_index] = distance;
+    //  }
+
+    let glob_index =
+       global_invocation_id.x +
+       global_invocation_id.y * num_workgroups.x * ${workgroupSize[0]} +
+       global_invocation_id.z * num_workgroups.x * ${workgroupSize[0]} * num_workgroups.y * ${workgroupSize[1]};
+
+    var distance:u32 = 0;
+    if (panels[glob_index] != 0){
+      for(var i: u32 = 0; i <= global_invocation_id.y+1; i++){
+        let nb_index =glob_index - i* num_workgroups.x * ${workgroupSize[0]};
+        // let nb_index =
+        //    global_invocation_id.x +
+        //    (global_invocation_id.y-i) * num_workgroups.x * ${workgroupSize[0]} +
+        //    global_invocation_id.z * num_workgroups.x * ${workgroupSize[0]} * num_workgroups.y * ${workgroupSize[1]};
+
+
+          if (global_invocation_id.y-i+1 == 0 || panels[nb_index] == 0) {
+            distance = i;
+            break;
+          }
+      }
+    }
+
+    result[glob_index] = distance;
+    // result[glob_index] = panels[glob_index];
+    // result[glob_index] =glob_index;
+  }
+  `;
+
+      const module = device.createShaderModule({code});
+
+      console.time('')
+      const pipeline = device.createComputePipeline({
+        label: 'compute pipeline',
+        layout: 'auto',
+        compute: {
+          module,
+          entryPoint: 'computeSomething',
+        },
+      });
+      console.timeEnd('')
+
+      console.time('buffers')
+
+      const numWorkgroups = arrayProd(dispatchCount);
+      // console.log('!@# z.html:main():86 ',numWorkgroups,numThreadsPerWorkgroup)
+      const numResults = numWorkgroups * numThreadsPerWorkgroup;
+      const size = numResults * 4;  // vec3f * u32
+      // console.log('!@# z.html:main():88 ',numResults)
+
+      let usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
+      const panelsBuffer = device.createBuffer({size, usage, mappedAtCreation: true});
+      const resultBuffer = device.createBuffer({size, usage});
+
+      const panelsTA = new Uint32Array(panelsBuffer.getMappedRange());
+      panelsTA.set(panelsFlat);
+      panelsBuffer.unmap();
+
+      // {
+      //   const panelsTA = new Uint32Array(panelsBuffer.getMappedRange());
+      //   console.log('!@# z.html:main():100 ',panelsTA)
+      //   panelsBuffer.unmap();
+      //
+      // }
+
+
+      usage = GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST;
+      // const panelsReadBuffer = device.createBuffer({size, usage});
+      const resultReadBuffer = device.createBuffer({size, usage});
+
+      const bindGroup = device.createBindGroup({
+        layout: pipeline.getBindGroupLayout(0),
+        entries: [
+          {binding: 0, resource: {buffer: panelsBuffer}},
+          {binding: 1, resource: {buffer: resultBuffer}},
+        ],
+      });
+
+      // Encode commands to do the computation
+      const encoder = device.createCommandEncoder({label: 'compute builtin encoder'});
+      const pass = encoder.beginComputePass({label: 'compute builtin pass'});
+
+      pass.setPipeline(pipeline);
+      pass.setBindGroup(0, bindGroup);
+      pass.dispatchWorkgroups(...dispatchCount);
+      pass.end();
+
+      // encoder.copyBufferToBuffer(panelsBuffer, 0, panelsReadBuffer, 0, size);
+      encoder.copyBufferToBuffer(resultBuffer, 0, resultReadBuffer, 0, size);
+
+      // Finish encoding and submit the commands
+      const commandBuffer = encoder.finish();
+      device.queue.submit([commandBuffer]);
+
+      console.time('wait')
+      await resultReadBuffer.mapAsync(GPUMapMode.READ)
+      console.timeEnd('wait')
+
+      // const workgroup = new Uint32Array(panelsReadBuffer.getMappedRange());
+      const result = new Uint32Array(resultReadBuffer.getMappedRange());
+      // const global = new Uint32Array(globalReadBuffer.getMappedRange());
+
+      console.timeEnd('buffers')
+      console.timeEnd('compute shader')
+
+      console.log('!@# z.html:main():134 ', result)
+      {
+        let s = ''
+        for (let i = 0; i < 8; i++) {
+          for (let j = 0; j < 8; j++) {
+            s += panels[i][j] + ','
+          }
+          s += '\n'
+        }
+        console.log(s)
+      }
+      {
+        let s = ''
+        for (let i = 0; i < 8; i++) {
+          for (let j = 0; j < 8; j++) {
+            s += result[i * layoutSide + j] + ','
+          }
+          s += '\n'
+        }
+        console.log(s)
+      }
+    }
+
+    function fail(msg) {
+      // eslint-disable-next-line no-alert
+      alert(msg);
+    }
+  }
+
+  main()
+</script>
+</body>
+</html>
