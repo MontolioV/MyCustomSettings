@@ -1,1 +1,5 @@
-mongodump --port= -u= -p= --authenticationDatabase=admin --archive=./dump
+mongodump --port=17251 -u=mongoadmin -p= --authenticationDatabase=admin --archive=./projects_04_08_23
+mongoexport --port=17151 -u=mongoadmin -p= --authenticationDatabase=admin -d=storage -c=projects -q '{"_id": {"$oid": "65cb690d29a374d7fd0417d2"}}' --out=./myRecords.json
+mongoimport --port=17151 -u=mongoadmin -p= --authenticationDatabase=admin -d=storage -c=projects ./myRecords.json
+
+mongosh --port=18441 -u=mongoadmin -p= --authenticationDatabase=admin
