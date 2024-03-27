@@ -1,4 +1,4 @@
-// node code/go_performance_tests/fib.mjs
+// node code/go_performance_tests/fib_shared.mjs
 import {
   Worker,
   isMainThread,
@@ -7,13 +7,15 @@ import {
 
 main()
 
+
 async function main() {
   if (isMainThread) {
     console.time('')
 
-    const arraySize = 100_000_000;
+    const arraySize = 1_000_000;
     // const arraySize = 1_000;
-    let randomNumbers = []
+    const sharedBuffer = new SharedArrayBuffer(arraySize);
+    let randomNumbers = new Int8Array(sharedBuffer);
     for (let i = 0; i < arraySize; i++) {
       randomNumbers[i] = i % 30;
     }
@@ -31,8 +33,11 @@ async function main() {
           groups[i] = m
           resolve()
         });
-        worker.postMessage({numbers:
-            randomNumbers.slice(i * groupSize, (i + 1) * groupSize)})
+        worker.postMessage({
+          buffer: sharedBuffer,
+          idx: i,
+          size: groupSize
+        })
       }))
     }
 
@@ -45,9 +50,27 @@ async function main() {
     console.timeEnd('')
   } else {
     parentPort.on('message', (msg) => {
-      let result = msg.numbers.reduce((acc, n) => {
-        return acc + fib(n);
-      },0)
+      let {buffer, idx, size} = msg
+      let numbers = new Int8Array(buffer,)
+      let start = idx * size
+      let end = start + size
+      let result = 0
+      for (let i = idx * size; i < end; i++) {
+        result += fib(numbers[i]);
+        // let iterations = numbers[i]
+        // let a = 0
+        // let b= 1
+        // let fib = 0
+        // for (let j = 0; j < iterations; j++) {
+        //   fib = a+b
+        //   a = b
+        //   b = fib
+        // }
+        // result += fib
+      }
+      // let result = numbers.reduce((acc, n) => {
+      //   return acc + fib(n);
+      // }, 0)
       parentPort.postMessage(result % 1000);
       process.exit(0)
     });

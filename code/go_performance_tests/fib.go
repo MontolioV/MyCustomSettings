@@ -15,15 +15,17 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 
 	// Create an array of 1 million random numbers
-	const arraySize = 1000000
-	randomNumbers := make([]int, arraySize)
+// 	const arraySize = 1000000
+	const arraySize = 100000000
+// 	const arraySize = 1000000000
+	randomNumbers := make([]int8, arraySize)
 
 	for i := 0; i < arraySize; i++ {
 		// 		randomNumbers[i] = rand.Intn(20) // Adjust the range as needed
-		randomNumbers[i] = i % 30
+		randomNumbers[i] = int8(i % 30)
 	}
 
-	groupsAmount := 100
+	groupsAmount := 32
 	groupSize := arraySize / groupsAmount
 	groups := make([]int, groupsAmount)
 
@@ -61,9 +63,23 @@ func main() {
 	fmt.Println("totalTime:", totalTime)
 }
 
-func fib(n int) int {
+// func fib(n int) int {
+// 	if n <= 1 {
+// 		return n
+// 	}
+// 	return fib(n-1) + fib(n-2)
+// }
+func fib(n int8) int {
 	if n <= 1 {
-		return n
+		return int(n)
 	}
-	return fib(n-1) + fib(n-2)
+	a := 0
+	b := 1
+	result := 0
+	for j := int8(1); j < n; j++ {
+	    result = a + b
+	    a = b
+	    b = result
+	}
+	return result
 }
