@@ -4,7 +4,7 @@ import {execSync} from "child_process";
 
 // Get input from clipboard using PowerShell
 const getClipboardCommand = 'powershell -command "Get-Clipboard"';
-const clipboardOutput = execSync(getClipboardCommand, { encoding: 'utf-8' });
+const clipboardOutput = execSync(getClipboardCommand, {encoding: 'utf-8'});
 console.log(clipboardOutput)
 const input = clipboardOutput.trim();
 const output = parseAndReformat(input);
@@ -21,14 +21,17 @@ try {
 function parseAndReformat(input) {
   // Regular expression to extract file path and line number
   const regex = /#L(.*)T(\d+)/;
+  const replaceRegex = /F(\d+)$/;
 
   // Executing the regex to extract file path and line number
   const match = input.match(regex);
 
   if (match) {
     // Extracting file path and line number from the matched groups
-    const filePath = match[1];
+    let filePath = match[1];
     const lineNumber = match[2];
+
+    filePath = filePath.replace(replaceRegex, '')
 
     // Reformatting the output
     return filePath + ':' + lineNumber;
