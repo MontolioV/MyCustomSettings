@@ -1,4 +1,4 @@
-let ns = [1e2, 1e3, 1e4, 1e5, 1e6];
+let ns = [4, 1e2, 1e3, 1e4, 1e5, 1e6];
 for (const n of ns) {
   let a = [];
   for (let i = 0; i < n; i++) {
