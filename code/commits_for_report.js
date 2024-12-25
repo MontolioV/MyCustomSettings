@@ -14,12 +14,16 @@ if (!startDate || !endDate) {
   let daysToEndSunday = -now.getDay();
   let daysToStartSunday = daysToEndSunday - 7;
   let dayMS = 24 * 60 * 60 * 1000;
-  startDate = new Date(now.getTime() + daysToStartSunday * dayMS).toLocaleDateString('ua-UA');
-  endDate = new Date(now.getTime() + daysToEndSunday * dayMS).toLocaleDateString('ua-UA');
+  startDate = new Date(
+    now.getTime() + daysToStartSunday * dayMS,
+  ).toLocaleDateString('ua-UA');
+  endDate = new Date(
+    now.getTime() + daysToEndSunday * dayMS,
+  ).toLocaleDateString('ua-UA');
 }
 
-console.log('startDate',startDate)
-console.log('endDate',endDate)
+console.log('startDate', startDate);
+console.log('endDate', endDate);
 
 let report = '';
 projectsForReport.forEach((project) => {
@@ -83,12 +87,10 @@ projectsForReport.forEach((project) => {
       }
     });
 
-    commitMessages = commitMessages.filter(
-      (m) => {
-        if (m.title==='Dependencies upgrade:') return false
-        return !(m.msg === '' && !!m.title?.match(/^\d+\.\d+\.\d+$/));
-      },
-    );
+    commitMessages = commitMessages.filter((m) => {
+      if (m.title === 'Dependencies upgrade:') return false;
+      return !(m.msg === '' && !!m.title?.match(/^\d+\.\d+\.\d+$/));
+    });
     sectionResults.push(commitMessages);
   });
 

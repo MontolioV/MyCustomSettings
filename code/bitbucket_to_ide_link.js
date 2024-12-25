@@ -1,11 +1,11 @@
 // node code/bitbucket_to_ide_link.js
 // only for windows powershell
-import {execSync} from "child_process";
+import { execSync } from 'child_process';
 
 // Get input from clipboard using PowerShell
 const getClipboardCommand = 'powershell -command "Get-Clipboard"';
-const clipboardOutput = execSync(getClipboardCommand, {encoding: 'utf-8'});
-console.log(clipboardOutput)
+const clipboardOutput = execSync(getClipboardCommand, { encoding: 'utf-8' });
+console.log(clipboardOutput);
 const input = clipboardOutput.trim();
 const output = parseAndReformat(input);
 
@@ -31,12 +31,11 @@ function parseAndReformat(input) {
     let filePath = match[1];
     const lineNumber = match[2];
 
-    filePath = filePath.replace(replaceRegex, '')
+    filePath = filePath.replace(replaceRegex, '');
 
     // Reformatting the output
     return filePath + ':' + lineNumber;
   } else {
-    return "Invalid input format";
+    return 'Invalid input format';
   }
 }
-

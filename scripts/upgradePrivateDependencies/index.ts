@@ -1,4 +1,4 @@
-//node --loader ts-node/esm scripts/upgradePrivateDependencies/index.ts
+//tsx scripts/upgradePrivateDependencies/index.ts
 import * as fs from 'fs';
 import * as Path from 'path';
 // @ts-expect-error no types
@@ -11,7 +11,7 @@ import { ShellCommandBuilder } from './ShellCommandBuilder.js';
 const PROJECTS_DIR = process.argv[2];
 if (!PROJECTS_DIR) {
   throw new Error(
-    `Incorrect arguments, example: "node --loader ts-node/esm scripts/upgradePrivateDependencies/index.ts $PROJECTS_DIR"`,
+    `Incorrect arguments, example: "tsx scripts/upgradePrivateDependencies/index.ts $PROJECTS_DIR"`,
   );
 }
 

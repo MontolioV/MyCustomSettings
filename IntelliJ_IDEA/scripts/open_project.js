@@ -55,7 +55,7 @@ function openByIndexes(idxsStr) {
         try {
           execSync(`idea64.exe ${dir}`);
         } catch (e) {
-          console.error(e)
+          console.error(e);
         }
       });
     }

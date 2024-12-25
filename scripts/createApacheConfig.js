@@ -3,19 +3,20 @@
 
 // import fs from "fs";
 // import {execSync} from "child_process";
-let fs = require("fs");
-let {execSync} = require("child_process");
-
+let fs = require('fs');
+let { execSync } = require('child_process');
 
 let domain = process.argv[2];
 let port = process.argv[3];
 
-if(!domain||!port){
-  throw new Error(`Invalid invocation, should be: node createApacheConfig.js $DOMAIN $PORT`)
+if (!domain || !port) {
+  throw new Error(
+    `Invalid invocation, should be: node createApacheConfig.js $DOMAIN $PORT`,
+  );
 }
 
-let httpName = `${domain}.conf`
-let httpsName = `${domain}-le-ssl.conf`
+let httpName = `${domain}.conf`;
+let httpsName = `${domain}-le-ssl.conf`;
 let httpData = `<VirtualHost *:80>
         ServerName ${domain}
 
@@ -23,7 +24,7 @@ let httpData = `<VirtualHost *:80>
         RewriteCond %{SERVER_NAME} =${domain}
         RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
 </VirtualHost>
-`
+`;
 let httpsData = `<IfModule mod_ssl.c>
 <VirtualHost *:443>
         ServerName ${domain}
@@ -34,21 +35,21 @@ let httpsData = `<IfModule mod_ssl.c>
 
 </VirtualHost>
 </IfModule>
-`
+`;
 
-save(httpName, httpData)
-save(httpsName, httpsData)
+save(httpName, httpData);
+save(httpsName, httpsData);
 
-reload(domain)
+reload(domain);
 
 function save(name, data) {
-  let path = '/etc/apache2/sites-available/' + name
+  let path = '/etc/apache2/sites-available/' + name;
   if (!fs.existsSync(path)) {
-    fs.writeFileSync(path, data)
+    fs.writeFileSync(path, data);
   }
 }
 
-function reload (domain) {
-    execSync(`a2ensite ${domain}`)
-    execSync(`service apache2 reload`)
+function reload(domain) {
+  execSync(`a2ensite ${domain}`);
+  execSync(`service apache2 reload`);
 }
