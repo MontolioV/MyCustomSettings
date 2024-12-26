@@ -82,11 +82,34 @@ class PSWDStore {
   }
 
   public async getPassword(): Promise<string> {
-    storageManager.listEntries();
-    const idx = parseInt(await getUserInputInsecure('Enter entry index: '));
-    const { password } = this.storage.entries[idx - 1];
-    if (!password) throw new Error('Password is not found');
+    const idx = await this.getEntryIdxFromUser();
+    const { password } = this.storage.entries[idx];
     return password;
+  }
+
+  public async rmEntry(): Promise<void> {
+    const idx = await this.getEntryIdxFromUser();
+    const { name } = this.storage.entries[idx];
+
+    const nameFromUser = await getUserInputInsecure(
+      `Removing '${name}'. To confirm deletion, enter entry name: `,
+    );
+    if (nameFromUser !== name) {
+      console.log('Entry name does not match');
+      return;
+    }
+
+    this.storage.entries.splice(idx, 1);
+    this.listEntries();
+    await this.saveStorage();
+  }
+
+  private async getEntryIdxFromUser(): Promise<number> {
+    this.listEntries();
+    const idx = parseInt(await getUserInputInsecure('Enter entry index: ')) - 1;
+    const entry = this.storage.entries[idx];
+    if (!entry) throw new Error('Entry was not found');
+    return idx;
   }
 
   private async prepareStorage(password: string): Promise<DecryptedStorage> {
@@ -345,7 +368,7 @@ async function userConfirmed(
 
 function toCb(str: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    const child = spawn('pwsh.exe', ['-Command', `Set-Clipboard "${str}"`]);
+    const child = spawn('pwsh.exe', ['-Command', `Set-Clipboard '${str}'`]);
     child.on('exit', (code) => {
       if (code === 0) {
         resolve();
@@ -385,6 +408,13 @@ prog
     await storageManager.loadStorage();
     const password = await storageManager.getPassword();
     await toCb(password);
+  });
+prog
+  .command('rm', 'Remove entry')
+  .example(`${scriptRoot} rm`)
+  .action(async (opts) => {
+    await storageManager.loadStorage();
+    await storageManager.rmEntry();
   });
 prog
   .command('DELETE', 'Removes password storage (irreversible)')
