@@ -1,0 +1,12 @@
+{
+  "name": "ExecJS",
+  "description": "Execute JavaScript code on any webpage",
+  "version": "1.0",
+  "manifest_version": 3,
+  "permissions": ["storage", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": "js-codes.png"
+  }
+}

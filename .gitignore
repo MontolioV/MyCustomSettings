@@ -2,3 +2,6 @@
 *.iml
 node_modules
 /code/pswdstore/storage
+
+/chrome_extensions/*.crx
+/chrome_extensions/*.pem
