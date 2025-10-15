@@ -6,3 +6,4 @@ IF [%1]==[16] CALL nvm use 16.16.0
 IF [%1]==[17] CALL nvm use 17.6.0
 IF [%1]==[20] CALL nvm use 20.11.0
 IF [%1]==[22] CALL nvm use 22.7.0
+IF [%1]==[24] CALL nvm use 24.3.0
