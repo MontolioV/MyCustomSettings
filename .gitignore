@@ -5,3 +5,6 @@ node_modules
 
 /chrome_extensions/*.crx
 /chrome_extensions/*.pem
+
+.zig-cache
+zig-out
