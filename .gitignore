@@ -2,9 +2,11 @@
 *.iml
 node_modules
 /code/pswdstore/storage
+code/keys_generator/config.js
 
 /chrome_extensions/*.crx
 /chrome_extensions/*.pem
 
 .zig-cache
 zig-out
+
