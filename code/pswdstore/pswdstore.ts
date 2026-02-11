@@ -63,7 +63,7 @@ class PSWDStore {
     const confirmationString = await getUserInputInsecure();
     if (confirmationString === 'DELETE') {
       fs.unlinkSync(this.filePath);
-      console.log('Storage has been deleted');
+      console.info('Storage has been deleted');
     }
   }
 
@@ -75,9 +75,17 @@ class PSWDStore {
     });
   }
 
+  public async updateEntryComment(): Promise<void> {
+    console.info('Updating the comment.');
+    const idx = await this.getEntryIdxFromUser();
+    this.storage.entries[idx].comment = await getUserInputInsecure(
+      'New comment: ',
+    );
+  }
+
   public listEntries(): void {
     this.storage.entries.forEach((entry, index) => {
-      console.log(`${index + 1}. ${entry.name} {${entry.comment}}`);
+      console.info(`${index + 1}. ${entry.name} {${entry.comment}}`);
     });
   }
 
@@ -95,7 +103,7 @@ class PSWDStore {
       `Removing '${name}'. To confirm deletion, enter entry name: `,
     );
     if (nameFromUser !== name) {
-      console.log('Entry name does not match');
+      console.info('Entry name does not match');
       return;
     }
 
@@ -398,6 +406,15 @@ prog
     } else {
       await storageManager.addEntry();
     }
+    storageManager.listEntries();
+    await storageManager.saveStorage();
+  });
+prog
+  .command('upd', 'Update existing entry')
+  .example(`${scriptRoot} upd`)
+  .action(async (opts) => {
+    await storageManager.loadStorage();
+    await storageManager.updateEntryComment();
     storageManager.listEntries();
     await storageManager.saveStorage();
   });
