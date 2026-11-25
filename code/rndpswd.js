@@ -8,7 +8,7 @@ let passLength = process.argv[2]
 let mode = process.argv[3] ? process.argv[3] : 'ans';
 
 let numberChars = '0123456789';
-let specialChars = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
+let specialChars = '^!$%/()=?+#-.,;:~*@[]{}_&';
 let alphabetChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
 let chars = [];
