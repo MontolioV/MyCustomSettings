@@ -1,0 +1,6 @@
+# Zig build output
+/statusline.exe
+/statusline.pdb
+/statusline
+/.zig-cache/
+/zig-out/
